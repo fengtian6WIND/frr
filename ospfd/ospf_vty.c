@@ -450,7 +450,7 @@ static void ospf_passive_interface_addr_set(struct ospf *ospf, struct interface 
 		for (ALL_LIST_ELEMENTS_RO(ifp->connected, cnode, co)) {
 			ip_ptr = (struct prefix_ipv4 *)co->address;
 			if (ip_ptr->family == AF_INET &&
-					!memcmp(&ip_ptr->prefix, &ipv4.prefix, sizeof(ipv4.prefix))) {
+			    !memcmp(&ip_ptr->prefix, &ipv4.prefix, sizeof(ipv4.prefix))) {
 				ipv4.prefixlen = ip_ptr->prefixlen;
 				break;
 			}
@@ -471,7 +471,7 @@ static void ospf_passive_interface_addr_set(struct ospf *ospf, struct interface 
 			oi = rn->info;
 			ip_ptr = (struct prefix_ipv4 *)oi->address;
 			if (ip_ptr->family == AF_INET &&
-					!memcmp(&ip_ptr->prefix, &ipv4.prefix, sizeof(ipv4.prefix))) {
+			    !memcmp(&ip_ptr->prefix, &ipv4.prefix, sizeof(ipv4.prefix))) {
 				ospf_if_set_multicast(oi);
 				break;
 			}
@@ -485,7 +485,7 @@ static void ospf_passive_interface_addr_set(struct ospf *ospf, struct interface 
 				continue;
 			ip_ptr = (struct prefix_ipv4 *)oi->address;
 			if (ip_ptr->family == AF_INET &&
-					!memcmp(&ip_ptr->prefix, &ipv4.prefix, sizeof(ipv4.prefix))) {
+			    !memcmp(&ip_ptr->prefix, &ipv4.prefix, sizeof(ipv4.prefix))) {
 				oi->passive_interface = OSPF_IF_ACTIVE;
 				ospf_if_up(oi);
 

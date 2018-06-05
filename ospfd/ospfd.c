@@ -984,7 +984,7 @@ static void add_ospf_interface(struct connected *co, struct ospf_area *area)
 	 * whenever r-id is configured instead.
 	 */
 	if ((area->ospf->router_id.s_addr != 0) && if_is_operative(co->ifp) &&
-			oi->passive_interface == OSPF_IF_ACTIVE)
+	    oi->passive_interface == OSPF_IF_ACTIVE)
 		ospf_if_up(oi);
 }
 
