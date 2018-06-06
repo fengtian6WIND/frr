@@ -70,7 +70,6 @@ extern struct zclient *zclient;
 
 
 static void ospf_remove_vls_through_area(struct ospf *, struct ospf_area *);
-void ospf_network_free(struct ospf *, struct ospf_network *);
 static void ospf_area_free(struct ospf_area *);
 static void ospf_network_run(struct prefix *, struct ospf_area *);
 static void ospf_network_run_interface(struct ospf *, struct interface *,
