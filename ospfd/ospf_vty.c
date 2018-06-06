@@ -397,7 +397,7 @@ static void ospf_passive_interface_set(struct ospf *ospf,
 				ospf_network_set(ospf, &ipv4, area_id,
 						 OSPF_AREA_ID_FMT_DECIMAL);
 			}
-                }
+		}
 		ospf->passive_interface_default = OSPF_IF_ACTIVE;
 
 		/* XXX We should call ospf_if_set_multicast on exactly those
@@ -414,7 +414,8 @@ static void ospf_passive_interface_set(struct ospf *ospf,
 		}
 	} else {
 		/* The passive interface has been added, then just activate
-		   the interface */
+		 *  the interface
+		 */
 		for (rn = route_top(IF_OIFS(ifp)); rn; rn = route_next(rn)) {
 			oi = rn->info;
 			if (oi->passive_interface == OSPF_IF_PASSIVE) {
@@ -504,7 +505,7 @@ static void ospf_passive_interface_addr_set(struct ospf *ospf,
 
 				/* XXX We should call ospf_if_set_multicast on
 				 * all those interfaces for which the
-                                 * passive property changed.
+				 * passive property changed.
 				 */
 				ospf_if_set_multicast(oi);
 				break;
@@ -580,7 +581,8 @@ DEFUN (no_ospf_passive_interface,
 	if (strmatch(argv[2]->text, "default")) {
 		FOR_ALL_INTERFACES (vrf, ifp) {
 			if (ifp)
-				ospf_passive_interface_set(ospf, ifp, OSPF_IF_ACTIVE);
+				ospf_passive_interface_set(ospf, ifp,
+							   OSPF_IF_ACTIVE);
 		}
 		return CMD_SUCCESS;
 	}
@@ -600,7 +602,8 @@ DEFUN (no_ospf_passive_interface,
 				"Please specify interface address by A.B.C.D\n");
 			return CMD_WARNING_CONFIG_FAILED;
 		}
-		ospf_passive_interface_addr_set(ospf, ifp, &addr, OSPF_IF_ACTIVE);
+		ospf_passive_interface_addr_set(ospf, ifp, &addr,
+						OSPF_IF_ACTIVE);
 		return CMD_SUCCESS;
 	}
 

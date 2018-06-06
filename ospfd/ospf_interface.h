@@ -188,7 +188,8 @@ struct ospf_interface {
 	struct connected *connected; /* Pointer to connected */
 
 	/* This flag indicate if the network of a interface is passive/active
-	   and it's more simple and clear than params->passive_interface */
+	 * and it's more simple and clear than params->passive_interface
+	 */
 	uint8_t passive_interface;
 
 	/* Configured varables. */
