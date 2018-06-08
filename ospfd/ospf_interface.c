@@ -529,7 +529,6 @@ static struct ospf_if_params *ospf_new_if_params(void)
 	UNSET_IF_PARAM(oip, output_cost_cmd);
 	UNSET_IF_PARAM(oip, transmit_delay);
 	UNSET_IF_PARAM(oip, retransmit_interval);
-	UNSET_IF_PARAM(oip, passive_interface);
 	UNSET_IF_PARAM(oip, v_hello);
 	UNSET_IF_PARAM(oip, fast_hello);
 	UNSET_IF_PARAM(oip, v_wait);
@@ -572,7 +571,6 @@ void ospf_free_if_params(struct interface *ifp, struct in_addr addr)
 	if (!OSPF_IF_PARAM_CONFIGURED(oip, output_cost_cmd)
 	    && !OSPF_IF_PARAM_CONFIGURED(oip, transmit_delay)
 	    && !OSPF_IF_PARAM_CONFIGURED(oip, retransmit_interval)
-	    && !OSPF_IF_PARAM_CONFIGURED(oip, passive_interface)
 	    && !OSPF_IF_PARAM_CONFIGURED(oip, v_hello)
 	    && !OSPF_IF_PARAM_CONFIGURED(oip, fast_hello)
 	    && !OSPF_IF_PARAM_CONFIGURED(oip, v_wait)

@@ -60,11 +60,6 @@ struct ospf_if_params {
 			 output_cost_cmd); /* Command Interface Output Cost */
 	DECLARE_IF_PARAM(uint32_t,
 			 retransmit_interval); /* Retransmission Interval */
-	DECLARE_IF_PARAM(uint8_t, passive_interface); /* OSPF Interface is
-							passive: no sending or
-							receiving (no need to
-							join multicast groups)
-							*/
 	DECLARE_IF_PARAM(uint8_t, priority); /* OSPF Interface priority */
 	/* Enable OSPF on this interface with area if_area */
 	DECLARE_IF_PARAM(struct in_addr, if_area);
@@ -73,14 +68,6 @@ struct ospf_if_params {
 	DECLARE_IF_PARAM(uint8_t, type); /* type of interface */
 #define OSPF_IF_ACTIVE                  0
 #define OSPF_IF_PASSIVE		        1
-
-#define OSPF_IF_PASSIVE_STATUS(O)                                              \
-	(OSPF_IF_PARAM_CONFIGURED((O)->params, passive_interface)              \
-		 ? (O)->params->passive_interface                              \
-		 : (OSPF_IF_PARAM_CONFIGURED(IF_DEF_PARAMS((O)->ifp),          \
-					     passive_interface)                \
-			    ? IF_DEF_PARAMS((O)->ifp)->passive_interface       \
-			    : (O)->ospf->passive_interface_default))
 
 	DECLARE_IF_PARAM(uint32_t, v_hello); /* Hello Interval */
 	DECLARE_IF_PARAM(uint32_t, v_wait);  /* Router Dead Interval */
@@ -188,7 +175,7 @@ struct ospf_interface {
 	struct connected *connected; /* Pointer to connected */
 
 	/* This flag indicate if the network of a interface is passive/active
-	 * and it's more simple and clear than params->passive_interface
+	 * and it's more simple and clear than params
 	 */
 	uint8_t passive_interface;
 

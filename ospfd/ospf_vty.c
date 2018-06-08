@@ -3658,7 +3658,7 @@ static void show_ip_ospf_interface_sub(struct vty *vty, struct ospf *ospf,
 				OSPF_IF_PARAM(oi, retransmit_interval));
 		}
 
-		if (OSPF_IF_PASSIVE_STATUS(oi) == OSPF_IF_ACTIVE) {
+		if (oi->passive_interface == OSPF_IF_ACTIVE) {
 			char timebuf[OSPF_TIME_DUMP_SIZE];
 			if (use_json) {
 				long time_store = 0;
