@@ -384,10 +384,28 @@ static void ospf_passive_interface_set(struct ospf *ospf,
 	struct ospf_interface *oi;
 	struct in_addr area_id = {0};
 	struct prefix_ipv4 ipv4, *ip_ptr;
+	int exist = 0;
 
 	if (create == OSPF_IF_PASSIVE) {
+		/* if networks of interface already been created
+		 * just update them all
+		 */
+		for (rn = route_top(IF_OIFS(ifp)); rn; rn = route_next(rn)) {
+			if ((oi = rn->info) == NULL)
+				continue;
+			exist = 1;
+			if (oi->passive_interface != OSPF_IF_ACTIVE)
+				continue;
+			oi->passive_interface = OSPF_IF_PASSIVE;
+			ospf_if_down(oi);
+			ospf_if_set_multicast(oi);
+		}
+		if (exist)
+			return;
+
 		/* create passive-interface from connected address */
 		ospf->passive_interface_default = OSPF_IF_PASSIVE;
+
 		for (ALL_LIST_ELEMENTS_RO(ifp->connected, cnode, co)) {
 			ip_ptr = (struct prefix_ipv4 *)co->address;
 			if (ip_ptr->family == AF_INET) {
@@ -454,6 +472,23 @@ static void ospf_passive_interface_addr_set(struct ospf *ospf,
 	ipv4.prefix = *addr;
 
 	if (create == OSPF_IF_PASSIVE) {
+		/* If network of interface has been created, just update it */
+		for (rn = route_top(IF_OIFS(ifp)); rn; rn = route_next(rn)) {
+			if ((oi = rn->info) == NULL)
+				continue;
+			ip_ptr = (struct prefix_ipv4 *)oi->address;
+			if (ip_ptr->family == AF_INET &&
+			    !memcmp(&ip_ptr->prefix, &ipv4.prefix,
+				    sizeof(ipv4.prefix))) {
+				if (oi->passive_interface != OSPF_IF_ACTIVE)
+					return;
+				oi->passive_interface = OSPF_IF_PASSIVE;
+				ospf_if_down(oi);
+				ospf_if_set_multicast(oi);
+				return;
+			}
+		}
+
 		/* First find the connected IPv4 addr of this interface */
 		for (ALL_LIST_ELEMENTS_RO(ifp->connected, cnode, co)) {
 			ip_ptr = (struct prefix_ipv4 *)co->address;
