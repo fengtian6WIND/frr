@@ -391,7 +391,8 @@ static void ospf_passive_interface_set(struct ospf *ospf,
 		 * just update them all
 		 */
 		for (rn = route_top(IF_OIFS(ifp)); rn; rn = route_next(rn)) {
-			if ((oi = rn->info) == NULL)
+			oi = rn->info;
+			if (!oi)
 				continue;
 			exist = 1;
 			if (oi->passive_interface != OSPF_IF_ACTIVE)
@@ -474,7 +475,8 @@ static void ospf_passive_interface_addr_set(struct ospf *ospf,
 	if (create == OSPF_IF_PASSIVE) {
 		/* If network of interface has been created, just update it */
 		for (rn = route_top(IF_OIFS(ifp)); rn; rn = route_next(rn)) {
-			if ((oi = rn->info) == NULL)
+			oi = rn->info;
+			if (!oi)
 				continue;
 			ip_ptr = (struct prefix_ipv4 *)oi->address;
 			if (ip_ptr->family == AF_INET &&
