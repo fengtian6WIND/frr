@@ -10231,7 +10231,7 @@ static int ospf_config_write_one(struct vty *vty, struct ospf *ospf)
 {
 	struct ospf_interface *oi;
 	struct listnode *node = NULL;
-	int write = 0;
+	int write = 0, passive_default = 1;
 
 	/* `router ospf' print. */
 	if (ospf->instance && ospf->name) {
@@ -10314,11 +10314,24 @@ static int ospf_config_write_one(struct vty *vty, struct ospf *ospf)
 	config_write_ospf_redistribute(vty, ospf);
 
 	for (ALL_LIST_ELEMENTS_RO(ospf->oiflist, node, oi)) {
-		if (oi->passive_interface != OSPF_IF_PASSIVE)
-			continue;
+		if (oi->passive_interface != OSPF_IF_PASSIVE) {
+			passive_default = 0;
+			break;
+		}
+	}
 
-		vty_out(vty, " passive-interface %s %s\n",
-			oi->ifp->name, inet_ntoa(oi->address->u.prefix4));
+	if (passive_default) {
+		/* all interface is passive */
+		vty_out(vty, " passive-interface default\n");
+	}
+	else {
+		for (ALL_LIST_ELEMENTS_RO(ospf->oiflist, node, oi)) {
+			if (oi->passive_interface != OSPF_IF_PASSIVE)
+				continue;
+
+			vty_out(vty, " passive-interface %s %s\n",
+				oi->ifp->name, inet_ntoa(oi->address->u.prefix4));
+		}
 	}
 
 	/* Network area print. */
