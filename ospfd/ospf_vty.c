@@ -404,9 +404,6 @@ static void ospf_passive_interface_set(struct ospf *ospf,
 		if (exist)
 			return;
 
-		/* create passive-interface from connected address */
-		ospf->passive_interface_default = OSPF_IF_PASSIVE;
-
 		for (ALL_LIST_ELEMENTS_RO(ifp->connected, cnode, co)) {
 			ip_ptr = (struct prefix_ipv4 *)co->address;
 			if (ip_ptr->family == AF_INET) {
@@ -417,7 +414,6 @@ static void ospf_passive_interface_set(struct ospf *ospf,
 						 OSPF_AREA_ID_FMT_DECIMAL);
 			}
 		}
-		ospf->passive_interface_default = OSPF_IF_ACTIVE;
 
 		/* XXX We should call ospf_if_set_multicast on exactly those
 		 * interfaces for which the passive property changed. It is
@@ -502,10 +498,8 @@ static void ospf_passive_interface_addr_set(struct ospf *ospf,
 			}
 		}
 		if (ipv4.prefixlen) {
-			ospf->passive_interface_default = OSPF_IF_PASSIVE;
 			ospf_network_set(ospf, &ipv4, area_id,
 					 OSPF_AREA_ID_FMT_DECIMAL);
-			ospf->passive_interface_default = OSPF_IF_ACTIVE;
 		}
 
 		/* XXX We should call ospf_if_set_multicast on exactly those
@@ -567,6 +561,8 @@ DEFUN (ospf_passive_interface,
 	struct vrf *vrf = vrf_lookup_by_id(ospf->vrf_id);
 
 	if (strmatch(argv[1]->text, "default")) {
+		/* create passive-interface from connected address */
+		ospf->passive_interface_default = OSPF_IF_PASSIVE;
 		FOR_ALL_INTERFACES (vrf, ifp) {
 			if (ifp)
 				ospf_passive_interface_set(ospf, ifp,
@@ -589,8 +585,10 @@ DEFUN (ospf_passive_interface,
 				"Please specify interface address by A.B.C.D\n");
 			return CMD_WARNING_CONFIG_FAILED;
 		}
+		ospf->passive_interface_default = OSPF_IF_PASSIVE;
 		ospf_passive_interface_addr_set(ospf, ifp, &addr,
 						OSPF_IF_PASSIVE);
+		ospf->passive_interface_default = OSPF_IF_ACTIVE;
 		return CMD_SUCCESS;
 	}
 
@@ -616,6 +614,7 @@ DEFUN (no_ospf_passive_interface,
 	struct vrf *vrf = vrf_lookup_by_id(ospf->vrf_id);
 
 	if (strmatch(argv[2]->text, "default")) {
+		ospf->passive_interface_default = OSPF_IF_ACTIVE;
 		FOR_ALL_INTERFACES (vrf, ifp) {
 			if (ifp)
 				ospf_passive_interface_set(ospf, ifp,

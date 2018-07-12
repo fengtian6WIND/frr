@@ -1317,6 +1317,74 @@ void ospf_ls_upd_queue_empty(struct ospf_interface *oi)
 	}
 }
 
+/* only add network and area */
+static int ospf_add_network_area(struct ospf *ospf, struct prefix_ipv4 *p,
+                     struct in_addr area_id, int df)
+{
+	struct ospf_network *network;
+	struct ospf_area *area;
+	struct route_node *rn;
+
+	rn = route_node_get(ospf->networks, (struct prefix *)p);
+	if (rn->info) {
+		network = rn->info;
+		route_unlock_node(rn);
+
+		if (IPV4_ADDR_SAME(&area_id, &network->area_id)) {
+			return 1;
+		} else {
+			/* There is already same network statement. */
+			return 0;
+		}
+	}
+
+	rn->info = network = ospf_network_new(area_id);
+	network->area_id_fmt = df;
+	area = ospf_area_get(ospf, area_id);
+	ospf_area_display_format_set(ospf, area, df);
+	return 0;
+}
+
+void ospf_passive_if_update(struct ospf *ospf, struct interface *ifp)
+{
+	struct in_addr area_id = {0};
+	struct listnode *cnode;
+	struct connected *co;
+	struct prefix_ipv4 ipv4, *ip_ptr;
+	struct ospf_area *area;
+
+	if (!ospf)
+		return;
+
+	if (IS_DEBUG_OSPF_EVENT)
+		zlog_debug(
+			"%s: passive-interface %s ifp->vrf_id %u ospf "
+			"vrf %s vrf_id %u router_id %s",
+			__PRETTY_FUNCTION__, ifp->name, ifp->vrf_id,
+			ospf_vrf_id_to_name(ospf->vrf_id), ospf->vrf_id,
+			inet_ntoa(ospf->router_id));
+
+	/* OSPF must be ready. */
+	if (!ospf_is_ready(ospf))
+		return;
+
+	for (ALL_LIST_ELEMENTS_RO(ifp->connected, cnode, co)) {
+		ip_ptr = (struct prefix_ipv4 *)co->address;
+		if (ip_ptr->family == AF_INET) {
+			ipv4.family = ip_ptr->family;
+			ipv4.prefix = ip_ptr->prefix;
+			ipv4.prefixlen = ip_ptr->prefixlen;
+			ospf_add_network_area(ospf, &ipv4, area_id,
+					 OSPF_AREA_ID_FMT_DECIMAL);
+			area = ospf_area_get(ospf, area_id);
+			ospf_network_run_interface(ospf, ifp, &ipv4, area);
+		}
+	}
+
+	/* Update connected redistribute. */
+	update_redistributed(ospf, 1);
+}
+
 void ospf_if_update(struct ospf *ospf, struct interface *ifp)
 {
 

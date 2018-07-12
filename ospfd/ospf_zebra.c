@@ -128,7 +128,10 @@ static int ospf_interface_add(int command, struct zclient *zclient,
 	if (!ospf)
 		return 0;
 
-	ospf_if_update(ospf, ifp);
+	if (ospf->passive_interface_default == OSPF_IF_PASSIVE)
+		ospf_passive_if_update(ospf, ifp);
+	else
+		ospf_if_update(ospf, ifp);
 
 	hook_call(ospf_if_update, ifp);
 
