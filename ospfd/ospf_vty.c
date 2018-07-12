@@ -10330,7 +10330,8 @@ static int ospf_config_write_one(struct vty *vty, struct ospf *ospf)
 				continue;
 
 			vty_out(vty, " passive-interface %s %s\n",
-				oi->ifp->name, inet_ntoa(oi->address->u.prefix4));
+				oi->ifp->name,
+				inet_ntoa(oi->address->u.prefix4));
 		}
 	}
 
